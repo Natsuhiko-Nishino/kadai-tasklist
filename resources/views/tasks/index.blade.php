@@ -24,5 +24,5 @@
             </tbody>
         </table>
     @endif
-
+ @include('users.users', ['users' => $users])
 @endsection
