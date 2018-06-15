@@ -24,5 +24,7 @@
             </tbody>
         </table>
     @endif
- @include('users.users', ['users' => $users])
+
+{!! link_to_route('tasks.create', 'post new task', null, ['class' => 'btn btn-primary']) !!}
+
 @endsection

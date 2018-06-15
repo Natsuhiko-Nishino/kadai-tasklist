@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\tasks;  
+use App\Task;
+
+use App\User;
+
+use App\Controllers;
 
 class tasksController extends Controller
 {
@@ -15,12 +19,21 @@ class tasksController extends Controller
      */
     public function index()
     {
-         $tasks = tasks::paginate(10);
+          $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('tasks.index', [
-            'tasks' => $tasks,
-              ]);
-    }
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+            $data += $this->counts($user);
+        return view('tasks.index', $data);
+        }else {
+            return view('welcome');
+    }}
+    
 
     /**
      * Show the form for creating a new resource.
@@ -29,7 +42,7 @@ class tasksController extends Controller
      */
     public function create()
     {
-         $tasks = new tasks;
+         $tasks = new Task;
 
         return view('tasks.create', [
             'tasks' => $tasks,
@@ -47,9 +60,10 @@ class tasksController extends Controller
         $this->validate($request, [
             'status' => 'required|max:10',   ]);
             
-         $tasks = new Tasks;
+         $tasks = new Task;
         $tasks->content = $request->content;
          $tasks->status = $request->status;
+         $tasks->user_id = \Auth::id();
         $tasks->save();
 
         return redirect('/');
@@ -63,7 +77,7 @@ class tasksController extends Controller
      */
     public function show($id)
     {
-         $tasks = tasks::find($id);
+         $tasks = Task::find($id);
 
         return view('tasks.show', [
             'tasks' => $tasks,
@@ -78,7 +92,7 @@ class tasksController extends Controller
      */
     public function edit($id)
     {
-        $tasks = tasks::find($id);
+        $tasks = Task::find($id);
 
         return view('tasks.edit', [
             'tasks' => $tasks,
@@ -98,7 +112,7 @@ class tasksController extends Controller
             'status' => 'required|max:10',
              ]);
         
-         $tasks = tasks::find($id);
+         $tasks = Task::find($id);
         $tasks->content = $request->content;
         $tasks->status = $request->status;
         $tasks->save();
@@ -115,7 +129,7 @@ class tasksController extends Controller
      */
     public function destroy($id)
     {
-         $tasks = tasks::find($id);
+         $tasks = Task::find($id);
         $tasks->delete();
 
         return redirect('/');
