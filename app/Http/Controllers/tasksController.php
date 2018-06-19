@@ -45,14 +45,12 @@ class tasksController extends Controller
        $tasks = new Task;
        if(\Auth::check()){
          $data = [
-                        'tasks' => $tasks,
-                        ];
-                        
-                    return view('tasks.show', $data);
-                }
-                else{
-                    return redirect('/');
-                }}  
+             'tasks' => $tasks,
+                ];
+        return view('tasks.create', $data);
+        }else{
+            return redirect('/');
+            }}  
        
     
     
